@@ -24,11 +24,11 @@ Using recent sales in Whitby and Durham Region, provide:
 1. A low-end estimate and a high-end estimate in CAD.
 2. A concise, first-person paragraph explaining how you arrived at that range.
 
-Return **strict JSON** with keys `lowEnd`, `highEnd`, and `estimateHtml`:
+Return strict JSON with keys 'lowEnd', 'highEnd', and 'estimateHtml', for example:
 {
   "lowEnd": "$980,000",
   "highEnd": "$1,080,000",
-  "estimateHtml": "<p>My estimate for …</p>"
+  "estimateHtml": "<p>My estimate for 1852 Manning Rd …</p>"
 }
 `;
 
