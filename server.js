@@ -3,9 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
 
-// 1. Create app
 const app = express();
-app.use(cors({ origin: 'https://www.harris-homes.ca' }));
+app.use(cors());           // ← allow all
 app.use(express.json());
 
 // 2. Health check
