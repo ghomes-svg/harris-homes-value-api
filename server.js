@@ -55,6 +55,32 @@ Return strict JSON with keys 'lowEnd', 'highEnd', and 'estimateHtml'.
     const aiText = completion.choices[0].message.content.trim();
     console.log('🤖 AI response:', aiText);
 
+    let payload;
+    try {
+      payload = JSON.parse(aiText);
+    } catch(parseErr) {
+      console.error('❌ JSON parse error:', parseErr);
+      // Return error JSON so client can handle
+      return res.status(200).json({ error: 'AI response format error' });
+    }
+
+    return res.json(payload);
+
+  } catch (err) {
+    console.error('❌ /api/estimate error', err);
+    // Return JSON error
+    return res.status(200).json({ error: 'AI error or invalid JSON' });
+  }
+});
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+    });
+
+    const aiText = completion.choices[0].message.content.trim();
+    console.log('🤖 AI response:', aiText);
+
     const payload = JSON.parse(aiText);
     res.json(payload);
 
