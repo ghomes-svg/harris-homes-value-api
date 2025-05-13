@@ -5,19 +5,22 @@ import OpenAI from 'openai';
 // Initialize Express
 const app = express();
 
-// --- MANUAL CORS MIDDLEWARE ---
+// --- MANUAL CORS MIDDLEWARE for all routes ---
 app.use((req, res, next) => {
-  // 1. Allow your front-end origin (for testing you can use '*')
+  // Allow requests from your front-end domain
   res.header('Access-Control-Allow-Origin', 'https://www.harris-homes.ca');
-  // 2. Allow these headers in requests
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  // 3. Allow these HTTP methods
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  // 4. Handle preflight OPTIONS request
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  // Continue to next middleware/route
   next();
+});
+
+// Explicitly handle preflight for /api/estimate
+app.options('/api/estimate', (req, res) => {
+  res.header('Access-Control-Allow-Origin', 'https://www.harris-homes.ca');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  return res.sendStatus(204);
 });
 
 // Parse JSON bodies
@@ -50,10 +53,7 @@ Return strict JSON with keys 'lowEnd', 'highEnd', and 'estimateHtml'.
 `;
 
   try {
-    // Initialize OpenAI client
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-    // Call ChatGPT
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
@@ -63,7 +63,6 @@ Return strict JSON with keys 'lowEnd', 'highEnd', and 'estimateHtml'.
     const aiText = completion.choices[0].message.content.trim();
     console.log('🤖 AI response:', aiText);
 
-    // Parse and return JSON
     const payload = JSON.parse(aiText);
     res.json(payload);
 
