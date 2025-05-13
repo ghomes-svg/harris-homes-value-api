@@ -26,6 +26,7 @@ app.post('/api/estimate', async (req, res) => {
   const data = req.body;
   // Extract city from address (assumes format 'street, city, province, country')
   const city = data.address.split(',')[1]?.trim() || data.address;
+
   const prompt = `
 You’re Geoff Harris from Harris Homes & Co. A client entered:
 • Address: ${data.address}
@@ -37,11 +38,14 @@ You’re Geoff Harris from Harris Homes & Co. A client entered:
 • Upgrades: ${data.upgrades.join(', ') || 'None'}
 • Size: ${data.squareFootage} ft²
 
-Using the latest MLS and public sales data specifically for ${city}—down to the neighbourhood or block level—identify the three most comparable properties sold in the past 30 days. Adjust for differences in home size, condition, and upgrades. Then provide:
-1. A low-end and high-end estimate in CAD based on those hyper-local comparables.
-2. A concise, first-person narrative explaining your analysis, including which exact addresses you selected and how you adjusted values.
+Based on **aggregated, reliable sources** (MLS summaries, CREA market reports, provincial land‐registry statistics) for ${city}, and **only** considering sales **within the last 30–60 days**, estimate:
+1. A low‐end and high‐end selling price range in CAD.
+2. A concise, first‐person paragraph explaining your methodology—referencing average sales trends, price per square foot in the neighbourhood, and adjustments for condition/upgrades.
 
-Return strict JSON with numeric values for lowEnd and highEnd, and an HTML-formatted estimateHtml containing your narrative.
+**Do not** list individual comparable addresses or raw sale prices. Return **strict JSON** with:
+- **lowEnd**: (number)
+- **highEnd**: (number)
+- **estimateHtml**: (string of HTML with your narrative)
 `;
 
   try {
@@ -55,7 +59,7 @@ Return strict JSON with numeric values for lowEnd and highEnd, and an HTML-forma
     let aiText = completion.choices[0].message.content.trim();
     console.log('🤖 AI raw response:', aiText);
 
-    // Strip Markdown code fences if present
+    // Remove any Markdown fences
     aiText = aiText.replace(/^```\w*\n?|```$/g, '').trim();
 
     let payload;
