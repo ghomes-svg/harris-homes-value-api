@@ -6,9 +6,9 @@ import OpenAI from 'openai';
 // Initialize Express
 const app = express();
 
-// Enable CORS properly, including preflight
-app.use(cors({ origin: 'https://www.harris-homes.ca', methods: ['GET','POST','OPTIONS'], allowedHeaders: ['Content-Type'] }));
-app.options('*', cors({ origin: 'https://www.harris-homes.ca', methods: ['GET','POST','OPTIONS'], allowedHeaders: ['Content-Type'] }));
+// Enable CORS for all origins and methods
+app.use(cors());
+app.options('*', cors());
 
 // Parse JSON bodies
 app.use(express.json());
