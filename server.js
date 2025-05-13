@@ -20,8 +20,10 @@ app.post('/api/estimate', async (req, res) => {
     kitchenCondition, bathroomCondition, upgrades, squareFootage
   } = req.body;
 
-  const fsa = postalCode?.slice(0,3) || '';
+  // Forward sortation area
+  const fsa = postalCode?.slice(0, 3) || '';
 
+  // Build the prompt
   const prompt = `
 You’re Geoff Harris from Harris Homes & Co. A client entered:
 • Full address: ${address}
@@ -35,16 +37,19 @@ You’re Geoff Harris from Harris Homes & Co. A client entered:
 • Upgrades: ${upgrades.join(', ') || 'None'}
 • Size: ${squareFootage} ft²
 
-Using aggregated official data (MLS, realtor.ca, housesigma.ca, CLAR reports, CREA reports, land-registry stats) for postal area ${fsa}, and only values in the last 60 days, estimate:
-1. Low-end and high-end price range (numbers only, CAD).
-1a. Factor in most recent comps, however if needed expand search criteria where appropriate.
-2. A very brief service oriented narrative explaining the methodology—highlight average $/ft², recent neighbourhood trends, and condition/upgrades.
-3. Approximately the amount they will save selling with Harris Homes
+Using aggregated official market data (MLS, realtor.ca, housesigma.ca, CLAR, CREA, provincial land-registry) for postal area ${fsa}, and only sales in the last 60 days:
+1. Estimate a low-end and high-end selling price range in CAD (numbers only).
+2. Provide a concise, first-person narrative explaining your methodology:
+   - Reference average $/ft² in the neighbourhood.
+   - Note recent market velocity and days-on-market.
+   - Adjust for condition and upgrades.
+3. Calculate the savings a seller would realize by using Harris Homes’ 3.99% commission instead of a typical 5%, based on the midpoint of your estimated range.
 
-**Do not** list individual addresses or raw comps. Return strict JSON with keys:
+**Do not** list individual addresses or raw comparable sales. Return strict JSON with keys:
 - lowEnd (number)
 - highEnd (number)
-- estimateHtml (HTML string)
+- savings (number)
+- estimateHtml (string of HTML summarizing range, narrative, and savings)
 `;
 
   try {
@@ -57,6 +62,8 @@ Using aggregated official data (MLS, realtor.ca, housesigma.ca, CLAR reports, CR
 
     let aiText = completion.choices[0].message.content.trim();
     console.log('🤖 AI raw response:', aiText);
+
+    // Strip any markdown fences
     aiText = aiText.replace(/^```\w*\n?|```$/g, '').trim();
 
     let payload;
