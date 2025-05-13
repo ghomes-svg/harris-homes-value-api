@@ -1,21 +1,17 @@
 // server.js
 import express from 'express';
+import cors from 'cors';
 import OpenAI from 'openai';
 
 // Initialize Express
 const app = express();
 
-// --- MANUAL CORS MIDDLEWARE for all routes ---
-app.use((req, res, next) => {
-  // Allow requests from your front-end domain
-  res.header('Access-Control-Allow-Origin', '*'); // temporarily allow all for testing
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  next();
-});
+// Use cors middleware to handle CORS automatically
+app.use(cors()); // allow all origins; you can restrict with { origin: 'https://www.harris-homes.ca' }
 
-// Explicitly handle preflight for all routes
+// Log OPTIONS requests for debugging
 app.options('*', (req, res) => {
+  console.log(`🔶 Preflight request for ${req.path}`);
   res.sendStatus(204);
 });
 
