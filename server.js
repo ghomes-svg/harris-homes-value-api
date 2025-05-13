@@ -24,20 +24,24 @@ app.post('/api/estimate', async (req, res) => {
   console.log('🟢 /api/estimate hit', req.body);
 
   const data = req.body;
+  // Extract city from address (assumes format 'street, city, province, country')
+  const city = data.address.split(',')[1]?.trim() || data.address;
   const prompt = `
 You’re Geoff Harris from Harris Homes & Co. A client entered:
 • Address: ${data.address}
-• Type: ${data.propertyType}
-• Beds/Baths: ${data.bedrooms}/${data.bathrooms}
-• Kitchen: ${data.kitchenCondition}, Bathroom: ${data.bathroomCondition}
+• City: ${city}
+• Property Type: ${data.propertyType}
+• Bedrooms/Bathrooms: ${data.bedrooms}/${data.bathrooms}
+• Kitchen Condition: ${data.kitchenCondition}
+• Bathroom Condition: ${data.bathroomCondition}
 • Upgrades: ${data.upgrades.join(', ') || 'None'}
 • Size: ${data.squareFootage} ft²
 
-Using recent sales in Whitby and Durham Region, provide:
-1. A low-end estimate and a high-end estimate in CAD.
-2. A concise, first-person paragraph explaining how you arrived at that range.
+Using the latest MLS and public sales data specifically for ${city}—down to the neighbourhood or block level—identify the three most comparable properties sold in the past 30 days. Adjust for differences in home size, condition, and upgrades. Then provide:
+1. A low-end and high-end estimate in CAD based on those hyper-local comparables.
+2. A concise, first-person narrative explaining your analysis, including which exact addresses you selected and how you adjusted values.
 
-Return strict JSON with keys 'lowEnd', 'highEnd', and 'estimateHtml'.
+Return strict JSON with numeric values for lowEnd and highEnd, and an HTML-formatted estimateHtml containing your narrative.
 `;
 
   try {
