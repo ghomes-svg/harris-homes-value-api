@@ -5,7 +5,6 @@ const app = express();
 app.use(cors({ origin: 'https://www.harris-homes.ca' }));
 app.use(express.json());
 
-import express from 'express';
 import OpenAI from 'openai';
 
 // 1. Create app
