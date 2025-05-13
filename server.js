@@ -3,18 +3,29 @@ import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
 
+// Initialize environment variables (if using dotenv locally)
+// import dotenv from 'dotenv';
+// dotenv.config();
+
 const app = express();
-app.use(cors());           // ← allow all
+
+// Enable CORS for all origins and handle preflight requests
+app.use(cors({ origin: ['https://www.harris-homes.ca', 'https://harris-homes.ca'] }));
+app.options('*', cors({ origin: ['https://www.harris-homes.ca', 'https://harris-homes.ca'] }));
+
+// Parse JSON bodies
 app.use(express.json());
 
-// 2. Health check
-app.get('/health', (_req, res) => res.send('OK'));
+// Health check endpoint
+app.get('/health', (_req, res) => {
+  res.send('OK');
+});
 
-// 3. Estimate endpoint
+// AI estimate endpoint
 app.post('/api/estimate', async (req, res) => {
   console.log('🟢 /api/estimate hit', req.body);
 
-  const data = req.body || {};
+  const data = req.body;
   const prompt = `
 You’re Geoff Harris from Harris Homes & Co. A client entered:
 • Address: ${data.address}
@@ -29,9 +40,10 @@ Using recent sales in Whitby and Durham Region, provide:
 2. A concise, first-person paragraph explaining how you arrived at that range.
 
 Return strict JSON with keys 'lowEnd', 'highEnd', and 'estimateHtml'.
-`;
+`;  
 
   try {
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
@@ -42,14 +54,14 @@ Return strict JSON with keys 'lowEnd', 'highEnd', and 'estimateHtml'.
     console.log('🤖 AI response:', aiText);
 
     const payload = JSON.parse(aiText);
-    return res.json(payload);
+    res.json(payload);
   } catch (err) {
     console.error('❌ /api/estimate error', err);
-    return res.status(500).send('AI error or invalid JSON');
+    res.status(500).send('AI error or invalid JSON');
   }
 });
 
-// 4. Listen on the correct port
+// Start server
 const port = parseInt(process.env.PORT, 10) || 3000;
 app.listen(port, () => {
   console.log(`🚀 Server listening on port ${port}`);
