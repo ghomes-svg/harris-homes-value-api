@@ -35,9 +35,11 @@ You’re Geoff Harris from Harris Homes & Co. A client entered:
 • Upgrades: ${upgrades.join(', ') || 'None'}
 • Size: ${squareFootage} ft²
 
-Using **aggregated official data** (MLS summaries, CREA reports, land-registry stats) for postal area ${fsa}, and **only** sales in the **last 30–60 days**, estimate:
+Using aggregated official data (MLS, realtor.ca, housesigma.ca, CLAR reports, CREA reports, land-registry stats) for postal area ${fsa}, and only values in the last 60 days, estimate:
 1. Low-end and high-end price range (numbers only, CAD).
-2. A brief first-person narrative explaining your methodology—highlight average $/ft², recent market velocity, and condition/upgrades.
+1a. Factor in most recent comps, however if needed expand search criteria where appropriate.
+2. A very brief service oriented narrative explaining the methodology—highlight average $/ft², recent neighbourhood trends, and condition/upgrades.
+3. Approximately the amount they will save selling with Harris Homes
 
 **Do not** list individual addresses or raw comps. Return strict JSON with keys:
 - lowEnd (number)
