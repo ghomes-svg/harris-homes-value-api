@@ -8,23 +8,24 @@ const app = express();
 // --- MANUAL CORS MIDDLEWARE for all routes ---
 app.use((req, res, next) => {
   // Allow requests from your front-end domain
-  res.header('Access-Control-Allow-Origin', 'https://www.harris-homes.ca');
+  res.header('Access-Control-Allow-Origin', '*'); // temporarily allow all for testing
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  // Continue to next middleware/route
   next();
 });
 
-// Explicitly handle preflight for /api/estimate
-app.options('/api/estimate', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'https://www.harris-homes.ca');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  return res.sendStatus(204);
+// Explicitly handle preflight for all routes
+app.options('*', (req, res) => {
+  res.sendStatus(204);
 });
 
 // Parse JSON bodies
 app.use(express.json());
+
+// Root endpoint (for uptime monitors)
+app.get('/', (_req, res) => {
+  res.send('Harris Home Value API is running');
+});
 
 // Health-check endpoint
 app.get('/health', (_req, res) => {
