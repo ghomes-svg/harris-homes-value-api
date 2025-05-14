@@ -18,17 +18,13 @@ A client wants an instant market value estimate. They provided:
 • FSA (postal): ${fsa}
 • Type: ${propertyType}
 • Beds/Baths: ${bedrooms}/${bathrooms}
-• Kitchen condition: ${kitchen}
-• Bathroom condition: ${bathroom}
-• Size: ${squareFootage} ft²
 
-Using only reputable, up‐to‐date sources (MLS summaries, CREA, Housesigma, land‐registry, Realty stats, neighbourhood averages) and sales in the last 60 days:
+Using only reputable, up‐to‐date sources (MLS summaries, CREA, Housesigma, land registry, Realty stats, neighbourhood averages) and sales in the last 60 days:
 1. Give a low‐end and high‐end market value in CAD (numbers only).
 2. Provide a brief, first‐person narrative that:
-   - Quotes ${address} average sale price and neighbourhood premium.
+   - Quotes ${fsa} average sale price and neighbourhood premium.
    - Explains how you combined those to derive the \$X–\$Y range (with a midpoint).
-3. **List your sources** at the end.
-4. Provide a CTA to let them know how much they can save between a typical 5% commission and the essential support commission at 3.99%.
+4. Calculate how much they can save between a typical 5% commission and the essential support commission at 3.99%.
 
 Return a JSON with:
 {
