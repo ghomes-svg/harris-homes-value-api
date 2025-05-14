@@ -24,18 +24,15 @@ app.post('/api/estimate', async (req, res) => {
   } = req.body;
 
   const prompt = `
-A client wants an instant market value estimate. They provided:
+A potential real estate seller client wants an instant market value estimate. They provided:
 • Address: ${address}
 • FSA (postal): ${fsa}
 • Type: ${propertyType}
 • Beds/Baths: ${bedrooms}/${bathrooms}
 
-Using only reputable, up‐to‐date sources (MLS summaries, CREA, HouseSigma, land registry, realty stats, neighbourhood averages) and sales in the last 60 days:
-1. Give a low‐end and high‐end market value in CAD (numbers only).
-2. Provide a brief, first‐person narrative that:
-   - Quotes the average sale price in ${fsa} and any neighbourhood premium.
-   - Explains how you combined those to derive the \$X–\$Y range (with a midpoint).
-3. Calculate how much they can save by using Harris Homes’ 3.99% “Essential Support” commission instead of a typical 5%.
+1. Identify a low‐end and high‐end market value in CAD. 
+2. Provide a summary that quotes the average sale price in ${fsa} and any neighbourhood premium, and explains how you combined those to derive the \$X–\$Y range (with a midpoint). 
+3. Calculate how much they can save using Harris Homes 3.99% Essential Support commission instead of a typical 5%.
 
 Return strict JSON with keys:
 {
