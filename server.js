@@ -1,11 +1,22 @@
+// server.js
 import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
 
 const app = express();
+
+// Enable CORS for all routes
 app.use(cors());
+// Parse JSON bodies
 app.use(express.json());
 
+// Root endpoint (for uptime monitors)
+app.get('/', (_req, res) => res.status(200).send('Harris Home Value API is running'));
+
+// Health-check endpoint
+app.get('/health', (_req, res) => res.status(200).send('OK'));
+
+// AI-powered estimate endpoint
 app.post('/api/estimate', async (req, res) => {
   const {
     address, fsa, propertyType, bedrooms, bathrooms,
@@ -19,18 +30,19 @@ A client wants an instant market value estimate. They provided:
 • Type: ${propertyType}
 • Beds/Baths: ${bedrooms}/${bathrooms}
 
-Using only reputable, up‐to‐date sources (MLS summaries, CREA, Housesigma, land registry, Realty stats, neighbourhood averages) and sales in the last 60 days:
+Using only reputable, up‐to‐date sources (MLS summaries, CREA, HouseSigma, land registry, realty stats, neighbourhood averages) and sales in the last 60 days:
 1. Give a low‐end and high‐end market value in CAD (numbers only).
 2. Provide a brief, first‐person narrative that:
-   - Quotes ${fsa} average sale price and neighbourhood premium.
+   - Quotes the average sale price in ${fsa} and any neighbourhood premium.
    - Explains how you combined those to derive the \$X–\$Y range (with a midpoint).
-4. Calculate how much they can save between a typical 5% commission and the essential support commission at 3.99%.
+3. Calculate how much they can save by using Harris Homes’ 3.99% “Essential Support” commission instead of a typical 5%.
 
-Return a JSON with:
+Return strict JSON with keys:
 {
   "lowEnd": number,
   "highEnd": number,
-  "estimateHtml": "<p>…your formatted narrative…</p><ul><li>Dan Plowman Realty</li><li>Zolo</li></ul>"
+  "savings": number,
+  "estimateHtml": "<p>…your formatted narrative…</p><ul><li>Source A</li><li>Source B</li></ul>"
 }
 `;
 
@@ -39,7 +51,7 @@ Return a JSON with:
     const resp = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7
+      temperature: 0.7,
     });
 
     let content = resp.choices[0].message.content.trim()
@@ -50,11 +62,13 @@ Return a JSON with:
     return res.json(result);
 
   } catch (err) {
-    console.error(err);
+    console.error('Estimation error:', err);
     return res.status(500).json({ error: 'Estimation failed' });
   }
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log('API listening');
+// Start server on Render’s provided port (or 3000 locally)
+const port = parseInt(process.env.PORT, 10) || 3000;
+app.listen(port, () => {
+  console.log(`🚀 API listening on port ${port}`);
 });
