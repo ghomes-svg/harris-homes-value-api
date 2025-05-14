@@ -37,9 +37,8 @@ Pricing Context & Methodology:
 Summary of the average sale price in ${fsa}, including any neighbourhood premium or discount.
 Step-by-step on how you blended those benchmarks to arrive at your $X–$Y range (and its midpoint).
 Commission Savings Analysis:
-Total commission paid at 3.99% (Harris Homes Essential Support) vs. 5% (typical).
-Exact dollar savings for the seller.
-Format your response in a short, concise, and easy-to-follow report, with bolded figures and a clear takeaway at the end.
+Outline the seller savings 3.99% (Harris Homes Essential Support) vs. 5% (typical) with a CTA.
+Format your response in a short, easy-to-follow report, with bolded figures.
 
 Return strict JSON with keys:
 {
