@@ -38,42 +38,9 @@ app.post('/api/estimate', async (req, res) => {
 
   // Assemble prompt without backticks inside
   const prompt = `Client Details
-` +
-    `• Address: ${address}
-` +
-    `• Postal (FSA): ${fsa}
-` +
-    `• Type: ${propertyType}
-` +
-    `• Beds/Baths: ${bedrooms} / ${bathrooms}
-` +
-    (squareFootage ? `• Square Footage: ${squareFootage}
-` : '') +
-    `
-You are a real-estate valuation assistant. When given property details, you must:
-` +
-    `- Produce a maximum 100-word first-person narrative wrapped in a single HTML string under the key "estimateHtml".
-` +
-    `- Output only valid JSON (no extra text) with these keys:
-` +
-    `  {\n` +
-    `    "lowEnd": number,\n` +
-    `    "highEnd": number,\n` +
-    `    "savings": number,\n` +
-    `    "estimateHtml": string\n` +
-    `  }
-` +
-    `Report requirements in that HTML string:
-` +
-    `1. Market-Value Range (CAD): Low–High (“$X – $Y”), Midpoint (“$Z”).
-` +
-    `2. Key Pricing Insight: One sentence on average sales and amenities in ${fsa}.
-` +
-    `3. Harris Homes Commission Advantage: Calculate (midpoint × 5%) – (midpoint × 3.99%).
-` +
-    `4. Call to Action: A one-line CTA, for example "Let's book your free detailed review.".
-` +
-    `Return only the JSON object.`;
+   You are a real estate professional, what is the value of address: ${address} 
+    
+    Return only the JSON object.`;
 
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
