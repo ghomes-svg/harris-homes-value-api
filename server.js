@@ -53,16 +53,16 @@ Client Details
 ${squareFootage ? `• Square Footage: ${squareFootage}
 
 ` : ''}
-Please deliver a ≤100-word report that includes:
+Please deliver a ≤100-word first-person report that includes:
 1. **Market-Value Range (CAD)**
    - **Low-High:** "$X – $Y" based on the latest public & MLS comps
    - **Midpoint:** "$Z"
 2. **Key Pricing Insight**
    - One sentence on average sales and amenities in ${fsa} (premium/discount if any)
-3. **Commission Advantage**
-   - Calculate (midpoint × 5%) – (midpoint × 3.99%) to show the exact dollar savings
+3. **Harris Homes Commission Advantage**
+   - Calculate (midpoint × 5%) – (midpoint × 3.99%) to show the exact dollar savings between the typical commission (5%) and Harris Homes Essential Support.
 4. **Call to Action**
-   - One short line prompting next steps (e.g. "Let’s book your free detailed review.")
+   -CTA prompting next steps (e.g. "Let’s book your free detailed review.")
 Return strict JSON with keys:
 {
   "lowEnd": number,
