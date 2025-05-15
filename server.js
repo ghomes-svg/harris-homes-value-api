@@ -37,7 +37,7 @@ Midpoint: “$Z.”
 Key Pricing Insight
 One sentence on average sales in ${fsa} (premium/discount if any).
 Commission Savings
-Calculation at 3.99% vs. 5%, using the midpoint to show exact dollar savings.
+Calculate the delta between 3.99% (the Harris Homes essential support package) and 5% (typical commission) using the midpoint price to show commission savings with Harris Homes.
 Call to Action
 One short line prompting next steps (e.g. “Let’s book your free detailed review.”)
 No need for sources.
