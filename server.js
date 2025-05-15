@@ -30,18 +30,22 @@ Client Details
 • Type: ${propertyType}
 • Beds/Baths: ${bedrooms} / ${bathrooms}
 
-Please deliver a concise report that includes:
-Market-Value Range (CAD)
-Low–High: “$X – $Y” based on the latest public & MLS comps.
-Midpoint: “$Z.”
-Key Pricing Insight
-One sentence on average sales in ${fsa} (premium/discount if any).
-Commission Savings
-Calculate the delta between 3.99% (the Harris Homes essential support package) and 5% (typical commission) using the midpoint price to show commission savings with Harris Homes.
-Call to Action
-One short line prompting next steps (e.g. “Let’s book your free detailed review.”)
-No need for sources.
+Please deliver a ≤75-word report that includes:
 
+1. **Market-Value Range (CAD)**
+   - **Low-High:** “$X – $Y” based on the latest public & MLS comps
+   - **Midpoint:** “$Z”
+
+2. **Key Pricing Insight**
+   - One sentence on average sales and amenities in ${fsa} (premium/discount if any)
+
+3. **Commission Savings**
+   - Calculate **(midpoint × 5%) – (midpoint × 3.99%)** to show the exact dollar savings at the midpoint price
+
+4. **Call to Action**
+   - One short line prompting next steps (e.g. “Let’s book your free detailed review.”)
+
+No need for source citations; bold only the figures.
 Return strict JSON with keys:
 {
   "lowEnd": number,
