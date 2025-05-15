@@ -1,13 +1,8 @@
 // server.js
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import morgan from 'morgan';
 import OpenAI from 'openai';
-import dotenv from 'dotenv';
 
-dotenv.config();
 
 // Ensure required env vars
 if (!process.env.OPENAI_API_KEY) {
@@ -22,18 +17,8 @@ const port = parseInt(process.env.PORT, 10) || 3000;
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Security and performance middleware
-app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: '10kb' }));
-app.use(morgan('tiny'));
-
-// Basic rate limiting: max 60 requests per minute per IP
-const apiLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 60,
-  message: { error: 'Too many requests, please try again later.' }
-});
-app.use('/api/', apiLimiter);
 
 // Root endpoint (uptime checks)
 app.get('/', (_req, res) => {
