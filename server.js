@@ -24,8 +24,7 @@ app.get('/health', (_req, res) => res.status(200).send('OK'));
 // Helper: validate required fields
 const validateBody = (body) => {
   const required = ['address','fsa','propertyType','bedrooms','bathrooms'];
-  const missing = required.filter(field => body[field] == null);
-  return missing;
+  return required.filter(field => body[field] == null);
 };
 
 // AI-powered estimate endpoint
@@ -37,48 +36,44 @@ app.post('/api/estimate', async (req, res) => {
 
   const { address, fsa, propertyType, bedrooms, bathrooms, squareFootage } = req.body;
 
-  const prompt = `
-Client Details
-• Address: ${address}
-• Postal (FSA): ${fsa}
-• Type: ${propertyType}
-• Beds/Baths: ${bedrooms} / ${bathrooms}
-${squareFootage ? `• Square Footage: ${squareFootage}\n
-` : ''}
-You are a real estate valuation assistant. When given property details, you must:
-
-• Produce a ≤100-word, first-person narrative wrapped in a single HTML string under `"estimateHtml"`.  
-• Output only valid JSON (no extra text) with these four keys:
-  {
-    "lowEnd": number,        // low end of the range in CAD
-    "highEnd": number,       // high end of the range in CAD
-    "savings": number,       // (midpoint×5%) – (midpoint×3.99%) in CAD
-    "estimateHtml": string   // the formatted, first-person report as HTML
-  }
-
-Report requirements (in that HTML string):
-
-1. **Market-Value Range (CAD)**  
-   - Low–High: “$X – $Y”  
-   - Midpoint: “$Z”  
-
-2. **Key Pricing Insight**  
-   One sentence on average sales and amenities in ${fsa} (premium/discount).
-
-3. **Harris Homes Commission Advantage**  
-   Show the exact dollar savings: (midpoint×5%) – (midpoint×3.99%).
-
-4. **Call to Action**  
-   A one-line CTA (e.g. “Let’s book your free detailed review.”).
-
-Do **not** include markdown, commentary, or citations—only the JSON object.  
-Return strict JSON with keys:
-{
-  "lowEnd": number,
-  "highEnd": number,
-  "savings": number,
-  "estimateHtml": string
-}`;
+  // Assemble prompt without backticks inside
+  const prompt = `Client Details
+` +
+    `• Address: ${address}
+` +
+    `• Postal (FSA): ${fsa}
+` +
+    `• Type: ${propertyType}
+` +
+    `• Beds/Baths: ${bedrooms} / ${bathrooms}
+` +
+    (squareFootage ? `• Square Footage: ${squareFootage}
+` : '') +
+    `
+You are a real-estate valuation assistant. When given property details, you must:
+` +
+    `- Produce a maximum 100-word first-person narrative wrapped in a single HTML string under the key "estimateHtml".
+` +
+    `- Output only valid JSON (no extra text) with these keys:
+` +
+    `  {\n` +
+    `    "lowEnd": number,\n` +
+    `    "highEnd": number,\n` +
+    `    "savings": number,\n` +
+    `    "estimateHtml": string\n` +
+    `  }
+` +
+    `Report requirements in that HTML string:
+` +
+    `1. Market-Value Range (CAD): Low–High (“$X – $Y”), Midpoint (“$Z”).
+` +
+    `2. Key Pricing Insight: One sentence on average sales and amenities in ${fsa}.
+` +
+    `3. Harris Homes Commission Advantage: Calculate (midpoint × 5%) – (midpoint × 3.99%).
+` +
+    `4. Call to Action: A one-line CTA, for example "Let's book your free detailed review.".
+` +
+    `Return only the JSON object.`;
 
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -89,10 +84,10 @@ Return strict JSON with keys:
     });
 
     let text = response.choices[0].message.content.trim();
+    // Remove fencing
     text = text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
     const result = JSON.parse(text);
     return res.json(result);
-
   } catch (err) {
     console.error('Estimation error:', err);
     return res.status(500).json({ error: 'Estimation failed' });
