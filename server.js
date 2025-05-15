@@ -25,20 +25,22 @@ app.post('/api/estimate', async (req, res) => {
 
   const prompt = `
 Client Details
-• Address: ${address}
-• Postal (FSA): ${fsa}
-• Property Type: ${propertyType}
-• Beds/Baths: ${bedrooms} beds / ${bathrooms} baths
+Address: ${address}
+Postal (FSA): ${fsa}
+Type: ${propertyType}
+Beds/Baths: ${bedrooms} / ${bathrooms}
 
-Please provide:
-Market-Value Range (CAD) based on the address:
-A realistic low-end and high-end market list price based on the latest public & MLS data.
-Pricing Context & Methodology:
-Summary of the average sale price in ${fsa}, including any neighbourhood premium or discount.
-Step-by-step on how you blended those benchmarks to arrive at your $X–$Y range (and its midpoint).
-Commission Savings Analysis:
-Outline the seller savings 3.99% (Harris Homes Essential Support) vs. 5% (typical) with a CTA.
-Format your response in a short, easy-to-follow report, with bolded figures.
+Please deliver a concise report that includes:
+Market-Value Range (CAD)
+Low–High: “$X – $Y” based on the latest public & MLS comps.
+Midpoint: “$Z.”
+Key Pricing Insight
+One sentence on average sales in ${fsa} (premium/discount if any).
+Commission Savings
+Calculation at 3.99% vs. 5%, using the midpoint to show exact dollar savings.
+Call to Action
+One short line prompting next steps (e.g. “Let’s book your free detailed review.”)
+Keep it under 75 words, with bolded figures only.
 
 Return strict JSON with keys:
 {
