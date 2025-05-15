@@ -29,8 +29,9 @@ Client Details
 • Postal (FSA): ${fsa}
 • Type: ${propertyType}
 • Beds/Baths: ${bedrooms} / ${bathrooms}
+• SquareFootage: ${squareFootage}
 
-Please deliver a ≤75-word report that includes:
+Please deliver a ≤100-word report that includes:
 
 1. **Market-Value Range (CAD)**
    - **Low-High:** “$X – $Y” based on the latest public & MLS comps
@@ -39,8 +40,8 @@ Please deliver a ≤75-word report that includes:
 2. **Key Pricing Insight**
    - One sentence on average sales and amenities in ${fsa} (premium/discount if any)
 
-3. **Commission Savings**
-   - Calculate **(midpoint × 5%) – (midpoint × 3.99%)** to show the exact dollar savings at the midpoint price
+3. **Commission Advantage**
+   - Calculate the delta between the Harris Homes Essential Support at 3.99% vs. a typical commission (savings should, for example, be midpoint * 1.01%)
 
 4. **Call to Action**
    - One short line prompting next steps (e.g. “Let’s book your free detailed review.”)
