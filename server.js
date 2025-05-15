@@ -25,10 +25,10 @@ app.post('/api/estimate', async (req, res) => {
 
   const prompt = `
 Client Details
-Address: ${address}
-Postal (FSA): ${fsa}
-Type: ${propertyType}
-Beds/Baths: ${bedrooms} / ${bathrooms}
+• Address: ${address}
+• Postal (FSA): ${fsa}
+• Type: ${propertyType}
+• Beds/Baths: ${bedrooms} / ${bathrooms}
 
 Please deliver a concise report that includes:
 Market-Value Range (CAD)
@@ -40,7 +40,7 @@ Commission Savings
 Calculation at 3.99% vs. 5%, using the midpoint to show exact dollar savings.
 Call to Action
 One short line prompting next steps (e.g. “Let’s book your free detailed review.”)
-Keep it under 75 words, with bolded figures only.
+No need for sources.
 
 Return strict JSON with keys:
 {
