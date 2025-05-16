@@ -4,61 +4,72 @@ import cors from 'cors';
 import OpenAI from 'openai';
 
 const app = express();
+
+// Port from environment or 3000
 const port = parseInt(process.env.PORT, 10) || 3000;
 
+// Fail fast if no API key
 if (!process.env.OPENAI_API_KEY) {
-  console.error('Missing OPENAI_API_KEY');
+  console.error('❌ Missing OPENAI_API_KEY');
   process.exit(1);
 }
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json());
 
-// Root endpoint (for uptime monitors)
-app.get('/', (_req, res) => res.status(200).send('Harris Home Value API is running'));
+// Log every request
+app.use((req, res, next) => {
+  console.log(`➡️ ${req.method} ${req.path}`);
+  next();
+});
 
-// Health-check endpoint
-app.get('/health', (_req, res) => res.status(200).send('OK'));
+// Root for uptime checks
+app.get('/', (_req, res) => {
+  res.status(200).send('Harris Home Value API is running');
+});
 
-// Helper: validate required fields
-const validateBody = (body) => {
-  const required = ['address','fsa','propertyType','bedrooms','bathrooms'];
-  return required.filter(field => body[field] == null);
-};
+// Health endpoint
+app.get('/health', (_req, res) => {
+  res.status(200).send('OK');
+});
 
-// AI-powered estimate endpoint
+// Estimate endpoint
 app.post('/api/estimate', async (req, res) => {
-  const missing = validateBody(req.body);
+  const { address, fsa, propertyType, bedrooms, bathrooms, squareFootage } = req.body || {};
+  const missing = ['address','fsa','propertyType','bedrooms','bathrooms']
+    .filter(f => !req.body?.[f]);
+
   if (missing.length) {
+    console.warn('❗ Missing fields:', missing);
     return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
   }
 
-  const { address, fsa, propertyType, bedrooms, bathrooms, squareFootage } = req.body;
-
-  // Assemble prompt without backticks inside
-  const prompt = `Client Details
-   You are a real estate professional, what is the value of address: ${address} 
-    
-    Return only the JSON object.`;
+  // Simple prompt to verify functionality
+  const prompt = `Return a JSON object with a "value" key estimating the value of ${address} in postal area ${fsa}.`;
 
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const response = await client.chat.completions.create({
+    const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0.0,
     });
 
-    let text = response.choices[0].message.content.trim();
-    // Remove fencing
-    text = text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    let text = completion.choices[0].message.content.trim()
+      .replace(/^```json\s*/, '').replace(/\s*```$/, '');
+
+    console.log('🤖 AI raw:', text);
     const result = JSON.parse(text);
     return res.json(result);
+
   } catch (err) {
-    console.error('Estimation error:', err);
+    console.error('💥 Estimation error:', err);
     return res.status(500).json({ error: 'Estimation failed' });
   }
 });
 
-app.listen(port, () => console.log(`🚀 API listening on port ${port}`));
+// Start server
+app.listen(port, () => {
+  console.log(`🚀 API listening on port ${port}`);
+});
