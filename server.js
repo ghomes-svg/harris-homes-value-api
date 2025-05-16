@@ -6,7 +6,6 @@ import OpenAI from 'openai';
 const app = express();
 const port = parseInt(process.env.PORT, 10) || 3000;
 
-// Abort if no API key
 if (!process.env.OPENAI_API_KEY) {
   console.error('❌ Missing OPENAI_API_KEY');
   process.exit(1);
@@ -15,17 +14,15 @@ if (!process.env.OPENAI_API_KEY) {
 app.use(cors());
 app.use(express.json());
 
-// Log each request
+// Log incoming requests
 app.use((req, res, next) => {
   console.log(`➡️ ${req.method} ${req.path}`);
   next();
 });
 
-// Uptime endpoints
-app.get('/', (_req, res) => res.status(200).send('Harris Home Value API is running'));
-app.get('/health', (_req, res) => res.status(200).send('OK'));
+app.get('/', (_req, res) => res.send('Harris Home Value API is running'));
+app.get('/health', (_req, res) => res.send('OK'));
 
-// Main estimate endpoint
 app.post('/api/estimate', async (req, res) => {
   const { address, fsa, propertyType, bedrooms, bathrooms, squareFootage } = req.body || {};
   const missing = ['address','fsa','propertyType','bedrooms','bathrooms']
@@ -35,34 +32,27 @@ app.post('/api/estimate', async (req, res) => {
     return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
   }
 
-  // System + user messages to enforce JSON-only
+  // Prompt only asks for lowEnd/highEnd and narrative
   const system = `
-You are an expert Canadian real estate agent. When asked, you MUST respond with STRICT JSON only.
-Never include apologies, disclaimers, or any extra text.
+You are an expert Canadian real estate agent. Respond with STRICT JSON only,
+no apologies or extra text.
 `;
-
   const user = `
-A potential home seller wants a quick market valuation. They provided:
+Client wants a market valuation. They provided:
 • Address: ${address}
 • Postal area (FSA): ${fsa}
-• Home type: ${propertyType}
-• Bedrooms/Bathrooms: ${bedrooms}/${bathrooms}
+• Type: ${propertyType}
+• Beds/Baths: ${bedrooms}/${bathrooms}
 • Size: ${squareFootage} ft²
 
-Using only up‐to‐date official data from the last 60 days,
-1. Lookup home values for the specific ${address} and drill down on the particular postal area (FSA): ${fsa}
-2. Using your knowledge Adjust for home type "${propertyType}", size ${squareFootage} ft², and ${bedrooms}/${bathrooms}.
-2. Return an estimated midpoint market value in CAD.
-3. Calculate the delta between a 5% and Harris Homes Essential Support 3.99% commission based on the midpoint market value, and include a CTA for the potential commission savings.
-4. Provide a short HTML‐formatted narrative with your findings.
-
-Return JSON in exactly this shape:
+Using official data (last 60 days),
+return JSON exactly:
 {
   "lowEnd": number,
   "highEnd": number,
-  "savings": number,
   "estimateHtml": string
 }
+The narrative in estimateHtml should explain how you arrived at the range.
 `.trim();
 
   try {
@@ -76,27 +66,32 @@ Return JSON in exactly this shape:
       temperature: 0.0,
     });
 
-    let text = completion.choices[0].message.content.trim()
+    // Clean and parse
+    let text = completion.choices[0].message.content
+      .trim()
       .replace(/^```json\s*/, '')
       .replace(/\s*```$/, '');
-
     console.log('🤖 AI raw:', text);
 
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch (parseErr) {
-      console.error('❌ JSON parse error:', parseErr);
-      // Fallback JSON
-      return res.json({
-        lowEnd: null,
-        highEnd: null,
-        savings: null,
-        estimateHtml: '<p>Sorry, we couldn’t generate a valuation right now.</p>'
-      });
-    }
+    let { lowEnd, highEnd, estimateHtml } = JSON.parse(text);
 
-    return res.json(result);
+    // Ensure numeric
+    lowEnd  = Number(lowEnd);
+    highEnd = Number(highEnd);
+
+    // Compute midpoint & precise savings
+    const midpoint = (lowEnd + highEnd) / 2;
+    const savings = Math.round(midpoint * (0.05 - 0.0399));  // 1.01% difference
+
+    // Append savings line and CTA
+    const savingsHtml = `
+      <p><strong>Commission savings:</strong> By choosing our 3.99% Essential Support,
+      you’d save approximately <strong>$${savings.toLocaleString()}</strong>
+      compared to a 5% commission on a midpoint value of $${Math.round(midpoint).toLocaleString()}.</p>
+    `;
+    estimateHtml += savingsHtml;
+
+    return res.json({ lowEnd, highEnd, savings, estimateHtml });
 
   } catch (err) {
     console.error('💥 Estimation error:', err);
@@ -109,7 +104,6 @@ Return JSON in exactly this shape:
   }
 });
 
-// Start listening
 app.listen(port, () => {
   console.log(`🚀 API listening on port ${port}`);
 });
