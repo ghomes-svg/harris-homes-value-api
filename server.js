@@ -4,49 +4,34 @@ import cors from 'cors';
 import OpenAI from 'openai';
 
 const app = express();
-
-// Port from environment or 3000
 const port = parseInt(process.env.PORT, 10) || 3000;
 
-// Fail fast if no API key
+// Ensure we have a key
 if (!process.env.OPENAI_API_KEY) {
   console.error('❌ Missing OPENAI_API_KEY');
   process.exit(1);
 }
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Log every request
+// Log incoming requests
 app.use((req, res, next) => {
-  console.log(`➡️ ${req.method} ${req.path}`);
+  console.log(`➡️ ${req.method} ${req.path} — body:`, req.body);
   next();
 });
 
-// Root for uptime checks
-app.get('/', (_req, res) => {
-  res.status(200).send('Harris Home Value API is running');
-});
+app.get('/', (_req, res) => res.status(200).send('Harris Home Value API is running'));
+app.get('/health', (_req, res) => res.status(200).send('OK'));
 
-// Health endpoint
-app.get('/health', (_req, res) => {
-  res.status(200).send('OK');
-});
-
-// Estimate endpoint
 app.post('/api/estimate', async (req, res) => {
-  const { address, fsa, propertyType, bedrooms, bathrooms, squareFootage } = req.body || {};
-  const missing = ['address','fsa','propertyType','bedrooms','bathrooms']
-    .filter(f => !req.body?.[f]);
-
+  const { address, fsa } = req.body || {};
+  const missing = ['address','fsa'].filter(f => !req.body?.[f]);
   if (missing.length) {
-    console.warn('❗ Missing fields:', missing);
     return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
   }
 
-  // Simple prompt to verify functionality
-  const prompt = `Return a JSON object with a "value" key estimating the value of ${address} in postal area ${fsa}.`;
+  const prompt = `Return a JSON object with a single "value" key estimating in CAD the current market value of ${address} (postal area ${fsa}).`;
 
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -59,9 +44,14 @@ app.post('/api/estimate', async (req, res) => {
     let text = completion.choices[0].message.content.trim()
       .replace(/^```json\s*/, '').replace(/\s*```$/, '');
 
-    console.log('🤖 AI raw:', text);
-    const result = JSON.parse(text);
-    return res.json(result);
+    console.log('🤖 AI raw response:', text);
+    const { value } = JSON.parse(text);
+
+    // Build an HTML snippet for the front end
+    const formatted = Number(value).toLocaleString('en-CA');
+    const estimateHtml = `<p>Your home is estimated at <strong>$${formatted}</strong> based on current market data.</p>`;
+
+    return res.json({ value, estimateHtml });
 
   } catch (err) {
     console.error('💥 Estimation error:', err);
@@ -69,7 +59,6 @@ app.post('/api/estimate', async (req, res) => {
   }
 });
 
-// Start server
 app.listen(port, () => {
   console.log(`🚀 API listening on port ${port}`);
 });
