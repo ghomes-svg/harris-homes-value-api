@@ -48,8 +48,9 @@ Client wants a quick market valuation. They provided:
 
 Using only up‐to‐date official data (home price index, CREA home value stats, land registry) from the last 60 days,
 1. Lookup micro home values for the specific postal area (FSA): ${fsa}
+2. Adjust for Home type: ${propertyType} and Size: ${squareFootage} ft² and Bedrooms/Bathrooms: ${bedrooms}/${bathrooms}
 2. Return an estimated midpoint market value in CAD.
-3. Calculate the delta between 5% and 3.99% commission, and a CTA for the Harris Homes Essential Support commission savings.
+3. Calculate the delta between a "typical" 5% and "Harris Homes Essential Support" 3.99% commission, and a CTA for the commission savings.
 4. Provide a short HTML‐formatted narrative with your findings.
 
 Return JSON in this exact shape:
