@@ -49,12 +49,12 @@ A potential home seller wants a quick market valuation. They provided:
 • Bedrooms/Bathrooms: ${bedrooms}/${bathrooms}
 • Size: ${squareFootage} ft²
 
-Using only up-to-date official data from the last 60 days,
-1. Lookup home values for ${address} in postal area ${fsa}.
-2. Adjust for home type "${propertyType}", size ${squareFootage} ft², and ${bedrooms}/${bathrooms}.
-3. Return a low-end and high-end market value in CAD.
-4. Calculate commission savings difference between 5% and 3.99% on the midpoint.
-5. Provide a short HTML-formatted narrative with those findings and a CTA.
+Using only up‐to‐date official data from the last 60 days,
+1. Lookup home values for the specific ${address} and drill down on the particular postal area (FSA): ${fsa}
+2. Using your knowledge Adjust for home type "${propertyType}", size ${squareFootage} ft², and ${bedrooms}/${bathrooms}.
+2. Return an estimated midpoint market value in CAD.
+3. Calculate the delta between a 5% and Harris Homes Essential Support 3.99% commission based on the midpoint market value, and include a CTA for the potential commission savings.
+4. Provide a short HTML‐formatted narrative with your findings.
 
 Return JSON in exactly this shape:
 {
