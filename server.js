@@ -34,18 +34,17 @@ app.post('/api/estimate', async (req, res) => {
 
   // Prompt only asks for lowEnd/highEnd and narrative
   const system = `
-You are an expert Canadian real estate agent. Respond with STRICT JSON only,
-no apologies or extra text.
+You are an expert Greater Toronto Area real estate agent. Respond with STRICT JSON only, no apologies or extra text.
 `;
   const user = `
-Client wants a market valuation. They provided:
+A website visitor is using your home valuation tool and is requesting an instant valuation. They provided:
 • Address: ${address}
 • Postal area (FSA): ${fsa}
 • Type: ${propertyType}
 • Beds/Baths: ${bedrooms}/${bathrooms}
 • Size: ${squareFootage} ft²
 
-Using official data (last 60 days),
+Using official data (last 60 days) using average home price specific to the ${fsa},
 return JSON exactly:
 {
   "lowEnd": number,
@@ -58,7 +57,7 @@ The narrative in estimateHtml should explain how you arrived at the range.
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const completion = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'GPT-4o',
       messages: [
         { role: 'system', content: system.trim() },
         { role: 'user',   content: user }
