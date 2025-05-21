@@ -57,7 +57,7 @@ The narrative in estimateHtml should explain how you arrived at the range.
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const completion = await client.chat.completions.create({
-      model: 'GPT-4o',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: system.trim() },
         { role: 'user',   content: user }
